@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_supply_forecast_root"
+              name="Forecast"
+              parent="stock.menu_stock_root"
+              sequence="100"/>
+
+    <menuitem id="menu_supply_forecast_dashboard"
+              name="Dashboard"
+              parent="menu_supply_forecast_root"
+              action="action_supply_forecast_dashboard"
+              sequence="5"/>
+
+    <menuitem id="menu_supply_forecast_main"
+              name="Forecasts"
+              parent="menu_supply_forecast_root"
+              sequence="10"/>
+
+    <menuitem id="menu_supply_forecast_records"
+              name="Demand Forecasts"
+              parent="menu_supply_forecast_main"
+              action="action_supply_forecast"
+              sequence="10"/>
+
+    <menuitem id="menu_supply_forecast_config"
+              name="Configuration"
+              parent="menu_supply_forecast_root"
+              sequence="100"/>
+</odoo>

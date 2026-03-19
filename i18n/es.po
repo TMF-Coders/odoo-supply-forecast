@@ -1,0 +1,158 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* supply_forecast
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-19 22:00+0000\n"
+"PO-Revision-Date: 2026-03-19 22:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: supply_forecast
+#: model:ir.model,name:supply_forecast.model_supply_forecast
+msgid "Supply Forecast"
+msgstr "Pronóstico de Suministros"
+
+#. module: supply_forecast
+#: model:ir.actions.act_window,name:supply_forecast.action_supply_forecast
+#: model:ir.ui.menu,name:supply_forecast.menu_supply_forecast_root
+#: model:ir.ui.menu,name:supply_forecast.menu_supply_forecast_main
+msgid "AI Supply Chain Optimizer"
+msgstr "Optimizador IA de Cadena de Suministro"
+
+#. module: supply_forecast
+#: model:ir.ui.menu,name:supply_forecast.menu_supply_forecast_dashboard
+msgid "Dashboard"
+msgstr "Tablero"
+
+#. module: supply_forecast
+#: template:supply_forecast.SupplyForecastDashboard
+msgid "Supply Chain Forecast Dashboard"
+msgstr "Tablero de Pronóstico de Cadena de Suministro"
+
+#. module: supply_forecast
+#: template:supply_forecast.SupplyForecastDashboard
+msgid "Total Forecasted Demand"
+msgstr "Demanda Total Pronosticada"
+
+#. module: supply_forecast
+#: template:supply_forecast.SupplyForecastDashboard
+msgid "Average Forecast Accuracy"
+msgstr "Precisión Media del Pronóstico"
+
+#. module: supply_forecast
+#: template:supply_forecast.SupplyForecastDashboard
+msgid "Pending Confirmations"
+msgstr "Confirmaciones Pendientes"
+
+#. module: supply_forecast
+#: template:supply_forecast.SupplyForecastDashboard
+msgid "Demand Forecast over Time"
+msgstr "Evolución de la Demanda"
+
+#. module: supply_forecast
+#: template:supply_forecast.SupplyForecastDashboard
+msgid "Top 5 Forecasted Products"
+msgstr "Top 5 Productos Pronosticados"
+
+#. module: supply_forecast
+#: field:supply.forecast,name:0
+msgid "Reference"
+msgstr "Referencia"
+
+#. module: supply_forecast
+#: field:supply.forecast,product_id:0
+msgid "Product"
+msgstr "Producto"
+
+#. module: supply_forecast
+#: field:supply.forecast,forecast_qty:0
+msgid "Forecast Quantity"
+msgstr "Cantidad Pronosticada"
+
+#. module: supply_forecast
+#: field:supply.forecast,service_level:0
+msgid "Service Level"
+msgstr "Nivel de Servicio"
+
+#. module: supply_forecast
+#: field:supply.forecast,lead_time:0
+msgid "Lead Time (Days)"
+msgstr "Tiempo de Entrega (Días)"
+
+#. module: supply_forecast
+#: field:supply.forecast,safety_stock:0
+msgid "Safety Stock"
+msgstr "Stock de Seguridad"
+
+#. module: supply_forecast
+#: field:supply.forecast,event_impact_factor:0
+msgid "Event Impact (%)"
+msgstr "Impacto de Evento (%)"
+
+#. module: supply_forecast
+#: field:supply.forecast,forecast_analysis:0
+msgid "AI Insights & Analysis"
+msgstr "Análisis e Insights de IA"
+
+#. module: supply_forecast
+#: field:supply.forecast,exception_alert:0
+msgid "Exception Alert"
+msgstr "Alerta de Excepción"
+
+#. module: supply_forecast
+#: selection:supply.forecast,exception_alert:0
+msgid "None"
+msgstr "Ninguna"
+
+#. module: supply_forecast
+#: selection:supply.forecast,exception_alert:0
+msgid "Overstock"
+msgstr "Sobre-stock"
+
+#. module: supply_forecast
+#: selection:supply.forecast,exception_alert:0
+msgid "Obsolescence"
+msgstr "Obsolescencia"
+
+#. module: supply_forecast
+#: button:supply.forecast,action_confirm:0
+msgid "Confirm"
+msgstr "Confirmar"
+
+#. module: supply_forecast
+#: button:supply.forecast,action_generate_ai_forecast:0
+msgid "Generate AI Forecast"
+msgstr "Generar Pronóstico IA"
+
+#. module: supply_forecast
+#: button:supply.forecast,action_generate_xai_insights:0
+msgid "Explain Recommendation"
+msgstr "Explicar Recomendación"
+
+#. module: supply_forecast
+#: button:supply.forecast,action_apply_to_orderpoint:0
+msgid "Apply to Reordering Rule"
+msgstr "Aplicar a Regla de Stock"
+
+#. module: supply_forecast
+#: page:supply.forecast,analysis:0
+msgid "AI Analysis (XAI)"
+msgstr "Análisis IA (XAI)"
+
+#. module: supply_forecast
+#: group:supply.forecast,safety_stock_params:0
+msgid "Safety Stock Params"
+msgstr "Parámetros de Stock de Seguridad"
+
+#. module: supply_forecast
+#: separator:supply.forecast,service_params:0
+msgid "Service Parameters"
+msgstr "Parámetros de Servicio"

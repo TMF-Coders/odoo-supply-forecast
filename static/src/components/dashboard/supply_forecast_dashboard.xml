@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="supply_forecast.SupplyForecastDashboard">
+        <div class="o_supply_forecast_dashboard h-100 overflow-auto">
+            <div class="o_dashboard_header">
+                <h2>Supply Chain Forecast Dashboard</h2>
+            </div>
+            
+            <div class="o_dashboard_cards">
+                <div class="o_dashboard_card">
+                    <span class="card_title">Total Forecasted Demand</span>
+                    <div class="card_content">
+                        <span class="card_value" t-out="state.data.total_forecasted"/>
+                        <span class="card_trend positive">+12% vs last month</span>
+                    </div>
+                </div>
+                <div class="o_dashboard_card">
+                    <span class="card_title">Average Forecast Accuracy</span>
+                    <div class="card_content">
+                        <span class="card_value" t-out="state.data.accuracy_avg"/>
+                    </div>
+                </div>
+                <div class="o_dashboard_card">
+                    <span class="card_title">Pending Confirmations</span>
+                    <div class="card_content">
+                        <span class="card_value" t-out="state.data.pending_confirmations"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="o_dashboard_charts">
+                <div class="o_chart_container">
+                    <h3>Demand Forecast over Time</h3>
+                    <div class="chart_box">
+                        <canvas t-ref="demandChart"></canvas>
+                    </div>
+                </div>
+                <div class="o_chart_container">
+                    <h3>Top 5 Forecasted Products</h3>
+                    <div class="chart_box">
+                        <canvas t-ref="productsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
