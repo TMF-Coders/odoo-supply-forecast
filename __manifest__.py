@@ -18,8 +18,11 @@ Key Features:
 * **Proactive Monitoring**: Real-time alerts for Overstock and Obsolescence.
 * **Multi-company & Multi-warehouse support**.
     """,
-    'author': 'TMF Coders',
+    'author': 'TMFCoders SL',
     'website': 'https://tmfcoders.com',
+    'price': 199.00,
+    'currency': 'EUR',
+    'license': 'OPL-1',
     'depends': ['stock', 'sale_stock', 'purchase_stock'],
     'data': [
         'security/ir.model.access.csv',
@@ -37,5 +40,4 @@ Key Features:
     'demo': [],
     'installable': True,
     'application': True,
-    'license': 'LGPL-3',
 }
