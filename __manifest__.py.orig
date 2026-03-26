@@ -26,7 +26,6 @@ Key Features:
     'depends': ['stock', 'sale_stock', 'purchase_stock'],
     'data': [
         'security/ir.model.access.csv',
-        'security/supply_forecast_security.xml',
         'data/ir_cron_data.xml',
         'views/supply_forecast_views.xml',
         'views/menus.xml',

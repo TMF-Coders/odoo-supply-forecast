@@ -24,7 +24,6 @@ class SupplyForecast(models.Model):
         ('demand', 'Demand'),
         ('stock_level', 'Target Stock Level')
     ], string='Forecast Type', default='demand')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company, required=True)
 
     service_level = fields.Selection([
         ('90', '90%'),
