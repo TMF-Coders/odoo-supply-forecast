@@ -2,7 +2,7 @@
     'name': 'AI Supply Chain Optimizer (Vertex AI)',
     'version': '19.0.1.0.0',
     'category': 'Inventory/Inventory',
-    'images': ['static/description/main_screenshot.png'],
+    'images': ['static/description/banner.png'],
     'summary': 'Enterprise-grade demand forecasting and inventory optimization powered by Vertex AI (TimesFM)',
     'description': """
 AI Supply Chain Optimizer
