@@ -1,4 +1,18 @@
+import logging
+import statistics
+import math
+from collections import defaultdict
+from random import uniform
+from dateutil.relativedelta import relativedelta
+
+try:
+    from google.cloud import aiplatform
+except ImportError:
+    aiplatform = None
+
 from odoo import models, fields, api
+
+_logger = logging.getLogger(__name__)
 
 class SupplyForecast(models.Model):
     _name = 'supply.forecast'
@@ -60,15 +74,12 @@ class SupplyForecast(models.Model):
 
     @api.depends('product_id', 'service_level', 'lead_time')
     def _compute_safety_stock(self):
-        import statistics
-        import math
         for rec in self:
             if not rec.product_id or not rec.lead_time:
                 rec.safety_stock = 0.0
                 continue
             
             # 1. Get historical volatility (Sigma)
-            from dateutil.relativedelta import relativedelta
             start_date = fields.Date.today() - relativedelta(months=12)
             sales = self.env['sale.order.line'].read_group(
                 [('product_id', '=', rec.product_id.id), ('state', 'in', ['sale', 'done']), ('order_id.date_order', '>=', start_date)],
@@ -139,28 +150,23 @@ class SupplyForecast(models.Model):
             'graph_products': graph_products,
         }
 
-    def action_generate_ai_forecast(self, horizon=6):
-        """ 
-        Extracts sales history and calls TimesFM (Vertex AI).
-        For now, simulates the AI call and creates draft forecasts.
-        """
-        self.ensure_one()
-        if not self.product_id:
-            return
+    @api.model
+    def _generate_forecast_for_product(self, product, horizon=6):
+        if not product:
+            return self.env['supply.forecast']
         
         # 0. Fetch Lead Time from Supplier
-        seller = self.product_id._select_seller(quantity=1.0)
-        self.lead_time = seller.delay if seller else 7.0 # Fallback to 7 days
+        seller = product._select_seller(quantity=1.0)
+        lead_time = seller.delay if seller else 7.0 # Fallback to 7 days
         
         # 1. Extraction: Get historical consumption (Sales + Production + Internal)
-        from dateutil.relativedelta import relativedelta
         start_date = fields.Date.today() - relativedelta(months=24)
         
         # We look for all 'done' moves that moved product OUT of our internal locations 
         # to Customers, Production, or Inventory (Scrap/Adjustment)
         moves = self.env['stock.move'].read_group(
             [
-                ('product_id', '=', self.product_id.id),
+                ('product_id', '=', product.id),
                 ('state', '=', 'done'),
                 ('date', '>=', start_date),
                 ('company_id', '=', self.env.company.id),
@@ -174,9 +180,8 @@ class SupplyForecast(models.Model):
         # 2. Preprocessing & Outlier Detection
         raw_history = [m['product_qty'] for m in moves]
         if not raw_history:
-            return
+            return self.env['supply.forecast']
             
-        import statistics
         history = raw_history
         if len(raw_history) > 3:
             mean = statistics.mean(raw_history)
@@ -188,8 +193,6 @@ class SupplyForecast(models.Model):
         
         # 3. Vertex AI Call (Real SDK Implementation)
         try:
-            from google.cloud import aiplatform
-            
             project = self.env['ir.config_parameter'].sudo().get_param('vertex_ai_project_id')
             location = self.env['ir.config_parameter'].sudo().get_param('vertex_ai_location', 'us-central1')
             endpoint_id = self.env['ir.config_parameter'].sudo().get_param('vertex_ai_endpoint_id')
@@ -197,20 +200,22 @@ class SupplyForecast(models.Model):
             if not project or not endpoint_id:
                 raise ValueError("Vertex AI not fully configured. Using fallback logic.")
 
-            aiplatform.init(project=project, location=location)
-            endpoint = aiplatform.Endpoint(endpoint_id)
-            
-            # TimesFM expected payload
-            instances = [{"history": history, "freq": "M"}]
-            parameters = {"horizon": horizon}
-            
-            _logger.info("Requesting real inference from Vertex AI Endpoint: %s", endpoint_id)
-            prediction = endpoint.predict(instances=instances, parameters=parameters)
-            predicted_values = prediction.predictions[0]
-            
+            if aiplatform:
+                aiplatform.init(project=project, location=location)
+                endpoint = aiplatform.Endpoint(endpoint_id)
+                
+                # TimesFM expected payload
+                instances = [{"history": history, "freq": "M"}]
+                parameters = {"horizon": horizon}
+                
+                _logger.info("Requesting real inference from Vertex AI Endpoint: %s", endpoint_id)
+                prediction = endpoint.predict(instances=instances, parameters=parameters)
+                predicted_values = prediction.predictions[0]
+            else:
+                raise ImportError("google.cloud.aiplatform is not installed")
+                
         except Exception as e:
             _logger.warning("Vertex AI real call failed or not configured (%s). Using fallback logic.", str(e))
-            from random import uniform
             predicted_values = [sum(history)/len(history) * uniform(0.9, 1.1) for _ in range(horizon)] if history else [10.0] * horizon
         
         # 4. Create Forecast records
@@ -219,15 +224,24 @@ class SupplyForecast(models.Model):
         for i, qty in enumerate(predicted_values):
             forecast_date = current_date + relativedelta(months=i+1)
             forecast_vals.append({
-                'product_id': self.product_id.id,
+                'product_id': product.id,
                 'date_start': forecast_date.replace(day=1),
                 'date_end': (forecast_date + relativedelta(months=1, days=-1)),
                 'forecast_qty': qty,
                 'model_type': 'ai',
-                'state': 'draft'
+                'state': 'draft',
+                'lead_time': lead_time
             })
         
         return self.env['supply.forecast'].create(forecast_vals)
+
+    def action_generate_ai_forecast(self, horizon=6):
+        """ 
+        Extracts sales history and calls TimesFM (Vertex AI).
+        For now, simulates the AI call and creates draft forecasts.
+        """
+        self.ensure_one()
+        return self._generate_forecast_for_product(self.product_id, horizon=horizon)
 
     def action_apply_to_orderpoint(self):
         """ 
@@ -274,10 +288,8 @@ class SupplyForecast(models.Model):
     def action_generate_xai_insights(self):
         """ Generates a human-readable explanation of the forecast logic """
         self.ensure_one()
-        from collections import defaultdict
         
         # 1. Trend Analysis
-        from dateutil.relativedelta import relativedelta
         start_date = fields.Date.today() - relativedelta(months=6)
         moves = self.env['stock.move'].search([
             ('product_id', '=', self.product_id.id),
@@ -341,7 +353,6 @@ class SupplyForecast(models.Model):
         """
         _logger.info("Starting Daily AI Forecast Cron for company %s", self.env.company.name)
         # Find products with sales in the last 6 months in current company
-        from dateutil.relativedelta import relativedelta
         six_months_ago = fields.Date.today() - relativedelta(months=6)
         
         product_ids = self.env['sale.order.line'].search([
@@ -352,16 +363,7 @@ class SupplyForecast(models.Model):
         
         count = 0
         for product in product_ids:
-            # We create a dummy forecast record to trigger the action
-            temp_forecast = self.create({
-                'product_id': product.id,
-                'date_start': fields.Date.today(),
-                'date_end': fields.Date.today(),
-                'forecast_qty': 0,
-                'model_type': 'ai'
-            })
-            temp_forecast.action_generate_ai_forecast(horizon=3)
-            temp_forecast.unlink() # Cleanup the trigger record
+            self._generate_forecast_for_product(product, horizon=3)
             count += 1
             
         _logger.info("Cron finished: Generated forecasts for %d products", count)
@@ -383,7 +385,6 @@ class SupplyForecast(models.Model):
                 continue
             
             # 3. Check Obsolescence (No sales/moves in 6 months)
-            from dateutil.relativedelta import relativedelta
             six_months_ago = fields.Date.today() - relativedelta(months=6)
             recent_moves = self.env['stock.move'].search_count([
                 ('product_id', '=', rec.product_id.id),
